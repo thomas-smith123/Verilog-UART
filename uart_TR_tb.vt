@@ -1,0 +1,54 @@
+`timescale 1 ns/ 1 ns//????????1ns????1ps
+
+module uart_TR_tb;
+localparam CLK_FRE = 50;      //clock frequency(Mhz)
+localparam BAUD_RATE = 115200; //serial baud rate
+	reg clk,rstn,rx_rxd;
+	wire [7:0]rx_data;
+	initial
+	begin
+		rstn=0;
+		rx_rxd=0;
+		#10 rstn=1;
+		clk=0;
+		forever #10 clk=~clk;
+		
+	end
+initial
+begin
+#17361 rx_rxd=~rx_rxd;
+#17361 rx_rxd=~rx_rxd;
+#17361 rx_rxd=~rx_rxd;
+#17361 rx_rxd=~rx_rxd;
+#17361 rx_rxd=~rx_rxd;
+#17361 rx_rxd=~rx_rxd;
+end
+uart_tx
+#(
+    	.CLK_FRE    (CLK_FRE  ),//????(Mhz)
+    	.BAUD_RATE  (BAUD_RATE ) //???(bps)
+)
+uart_tx_inst
+(
+	.clk(clk),              //clock input
+	.rst_n(rstn),            //asynchronous reset input, low active 
+	.tx_data(rx_data[7:0]),          //data to send
+	.tx_data_valid(tx_data_valid),    //  input
+	.tx_data_ready(rx_data_valid),    //send ready  output
+	.tx_pin(tx_pin)           //serial data output
+);
+uart_rx
+#(
+    	.CLK_FRE       (CLK_FRE       ),//????(Mhz)
+   	.BAUD_RATE      (BAUD_RATE      ) //???(bps)
+)
+uart_rx_inst
+(
+    	.clk            (clk            ),
+    	.rst_n          (rstn          ),
+	.rx_data_valid(rx_data_valid),
+    	.rx_rxd         (rx_rxd       ),//????
+    	.rx_data        (rx_data[7:0] ),//??1????
+    	.rx_data_ready  (tx_data_valid) //1???????? output
+);
+endmodule
